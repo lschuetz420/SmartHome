@@ -164,19 +164,10 @@ public class Dialog implements Runnable{
         System.out.println("IP:");
         String ip = scanner.nextLine();
 
-        int port = 0;
-        try{
-            System.out.println("Port:");
-            port = scanner.nextInt();
-            scanner.nextLine();
-        } catch(InputMismatchException e){
-            System.out.println("Invalid Port, only numbers are allowed");
-        }
-        
         System.out.println("Host name:");
         String hostName = scanner.nextLine();
 
-        Client client = new Client(ip, port, hostName);
+        Client client = new Client(ip,hostName);
 
         try{
             new WhitelistManager().addClient(client);
@@ -205,11 +196,10 @@ public class Dialog implements Runnable{
                 Client client = clients.get(i);
     
                 String ip = client.getIp();
-                String port = Integer.toString(client.getPort());
                 String hostName = client.getHostname();
     
                 System.out.println("User_" + counter + ":");
-                System.out.println("IP: " + ip + "Port: " + port + "Host name: " + hostName);
+                System.out.println("IP: " + ip + "Host name: " + hostName);
             }
             
             String entry = scanner.nextLine();
@@ -230,6 +220,7 @@ public class Dialog implements Runnable{
     }
 
     public void deleteUserEntryWhitelistDialog(){
+        Scanner scanner = new Scanner(System.in);
         String whitelist = "";
 
         try {
@@ -239,8 +230,51 @@ public class Dialog implements Runnable{
         }
 
         System.out.println("Whitelist:\n" + whitelist);
-        System.out.println("Do you want to delete an entry from this list?");
+        System.out.println("Do you want to delete an entry from this list? Enter Y | N");
+        String input = scanner.nextLine();
+
+        String ip;
+        String hostName;
+
+        switch (input){
+
+            case "Y":
+            case "y":
+                System.out.println("Please enter the IP and host name of the client you want to delete.");
+
+                System.out.println("IP:");
+                ip = scanner.nextLine();
+
+                System.out.println("Host name:");
+                hostName = scanner.nextLine();
+
+                String clientData = new Client(ip, hostName).toString();
+
+                if (whitelist.contains(clientData)){
+                    whitelist = whitelist.replace(clientData,"");    
+
+                    try {
+                        new WhitelistManager().writeEntry(whitelist);
+                    } catch(IOException e){
+                        e.printStackTrace();
+                    }
+                } else {
+                    Sys
+                }
+
+            break;
+
+            case "N":
+            case "n":
+
+            break;
         
+            default:
+                System.out.println("Invalid input");
+            break;
+        }
+
+
     }
 
     public boolean portOK(int port){

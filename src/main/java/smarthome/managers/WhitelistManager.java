@@ -49,7 +49,7 @@ public class WhitelistManager{
 
         if (whitelist.contains(clientData)){
             whitelist = whitelist.replace(clientData, "");
-            writeEntry(clientData);
+            writeEntry(whitelist);
         } else {
             System.out.println("Client is not whitelisted");
         }
