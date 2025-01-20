@@ -8,14 +8,16 @@ import java.nio.file.Path;
 
 public class LogFileManager{
 
-    File logFile;
-    String path = "./data/logs/Serverlogs.txt";
-    FileWriter fileWriter;
+    private File logFile;
+    private String path = "C:/Projects/SmartHome/src/main/java/smarthome/data/log.txt";
+
+    private FileWriter fileWriter;
 
     public LogFileManager() throws IOException{
-        this.logFile = new File(path);
-        this.fileWriter = new FileWriter(logFile, true);
-        this.logFile.setReadOnly();
+        logFile = new File(path);
+        logFile.setWritable(true);
+        fileWriter = new FileWriter(logFile, true);
+        logFile.setReadOnly();
     }
 
     public void addLog(String log) throws IOException{

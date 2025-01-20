@@ -9,11 +9,15 @@ import java.nio.file.Path;
 import smarthome.server.Client;
 
 public class WhitelistManager{
-    public FileWriter fileWriter;
-    public File whitelistFile;
+
+    private File whitelistFile;
+    private String path = "C:/Projects/SmartHome/src/main/java/smarthome/properties/Whitelist.txt";
+    
+    private FileWriter fileWriter;
 
     public WhitelistManager() throws IOException{
-        whitelistFile = new File("C:/Projects/SmartHome/src/main/java/smarthome/properties/Whitelist.properties");
+        whitelistFile = new File(path);
+        whitelistFile.setWritable(true);
         fileWriter = new FileWriter(whitelistFile);
         whitelistFile.setReadOnly();
     }
@@ -56,7 +60,7 @@ public class WhitelistManager{
     }
 
     public String getWhitelist() throws IOException{
-        String whitelist = Files.readString(Path.of("./backend/java/properties/whitelist.txt"));
+        String whitelist = Files.readString(Path.of(path));
         return whitelist;
     }
 
