@@ -56,14 +56,13 @@ public class Server{
                     Socket clientSocket = serverSocket.accept();
                     
                     String clientIP = clientSocket.getInetAddress().getHostAddress();
-                    Integer clientPort = clientSocket.getPort();
                     String clientName = clientSocket.getInetAddress().getHostName();
-                    Client client = new Client(clientIP, clientPort, clientName);
+                    Client client = new Client(clientIP, clientName);
                     clients.add(client);
 
                     LocalDate date = LocalDate.now();
                     LocalTime time = LocalTime.now();
-                    String log = "New user connected. IP: " + clientIP + " Port " + clientPort + " HostName: " + clientName + " Date: " + date + " Time: " + time;
+                    String log = "New user connected. IP: " + clientIP + " HostName: " + clientName + " Date: " + date + " Time: " + time;
                     new LogFileManager().addLog(log);
                     System.out.println(log);
                     
