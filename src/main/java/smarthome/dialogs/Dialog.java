@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 import smarthome.server.*;
+import smarthome.util.ErrorHandler;
 import smarthome.managers.WhitelistManager;
 
 public class Dialog implements Runnable{
@@ -132,6 +133,7 @@ public class Dialog implements Runnable{
                         serverSocket.close();
                     } catch(IOException e){
                         System.out.println("Server closed");
+                        new ErrorHandler().addLog(e);
                     }
                     
                     commandAccepted = true;
@@ -152,6 +154,14 @@ public class Dialog implements Runnable{
                 case "Delete-Entry -Target Whitelist":
                     deleteUserEntryWhitelistDialog();
                     commandAccepted = true;
+                break;
+
+                case "Get-Content -Target Whitelist":
+                    try{
+                        System.out.println(new WhitelistManager().getWhitelist());
+                    } catch (IOException e){
+                        new ErrorHandler().printToConsoleAddLog(e);
+                    }
                 break;
 
             }
@@ -178,7 +188,7 @@ public class Dialog implements Runnable{
         try{
             new WhitelistManager().addClient(client);
         } catch(IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
     }
 
@@ -219,7 +229,7 @@ public class Dialog implements Runnable{
                 try{
                     new WhitelistManager().addClient(client);
                 } catch(IOException e){
-                    e.printStackTrace();
+                    new ErrorHandler().printToConsoleAddLog(e);
                 }
             }
         }
@@ -232,7 +242,7 @@ public class Dialog implements Runnable{
         try {
             whitelist = new WhitelistManager().getWhitelist();
         } catch (IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
 
         System.out.println("Whitelist:\n" + whitelist);
@@ -262,7 +272,7 @@ public class Dialog implements Runnable{
                     try {
                         new WhitelistManager().writeEntry(whitelist);
                     } catch(IOException e){
-                        e.printStackTrace();
+                        new ErrorHandler().printToConsoleAddLog(e);
                     }
                 } else {
                     System.out.println("Client not found");

@@ -9,7 +9,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import smarthome.dialogs.*;
-import smarthome.managers.*;
+import smarthome.managers.LogFileManager;
+import smarthome.managers.LogFileManager.Log;
+import smarthome.managers.WhitelistManager;
+import smarthome.util.ErrorHandler;
 
 public class Server{
     private static Server instance;
@@ -69,7 +72,7 @@ public class Server{
                     LocalDate date = LocalDate.now();
                     LocalTime time = LocalTime.now();
                     String log = "New user connected. IP: " + clientIP + " HostName: " + clientName + " Date: " + date + " Time: " + time;
-                    new LogFileManager().addLog(log);
+                    new LogFileManager(Log.LOGIN).addLog(log);
                     System.out.println(log);
                     
                     WhitelistManager whitelistManager = new WhitelistManager();
@@ -79,18 +82,18 @@ public class Server{
                     } else{
                         String logNotWhitelisted = "User not whitelisted. Connection refused."; 
                         System.out.println(logNotWhitelisted);
-                        new LogFileManager().addLog(logNotWhitelisted);
+                        new LogFileManager(Log.LOGIN).addLog(logNotWhitelisted);
                     }
                 }
             } else {
-
+                System.out.println("Server already started");
             }  
         } catch(SocketException e){    
-            e.printStackTrace();
             System.out.println("Server closed");
+            new ErrorHandler().printToConsoleAddLog(e);
         } catch(IOException e){
             System.out.println("Server exception");
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
     }   
 

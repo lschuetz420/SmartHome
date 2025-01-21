@@ -3,6 +3,7 @@ package smarthome.server;
 import java.net.*;
 
 import smarthome.managers.ScreenManager;
+import smarthome.util.ErrorHandler;
 
 import java.io.*;
 import java.io.IOException;
@@ -44,8 +45,7 @@ public class ClientHandler implements Runnable{
             }
         
         } catch(IOException e){
-            e.printStackTrace();
-                
+            new ErrorHandler().printToConsoleAddLog(e);
         }
         
     }

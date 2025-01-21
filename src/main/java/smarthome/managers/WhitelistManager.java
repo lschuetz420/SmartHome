@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import smarthome.server.Client;
+import smarthome.util.ErrorHandler;
 
 public class WhitelistManager{
 
@@ -48,7 +49,7 @@ public class WhitelistManager{
         try{
             whitelist = getWhitelist();
         } catch(IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
 
         if (whitelist.contains(clientData)){
@@ -76,7 +77,7 @@ public class WhitelistManager{
             } ok = false;
 
         } catch(IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
 
         return ok;

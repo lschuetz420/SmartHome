@@ -9,12 +9,30 @@ import java.nio.file.Path;
 public class LogFileManager{
 
     private File logFile;
-    private String path = "C:/Projects/SmartHome/src/main/java/smarthome/data/log.txt";
+
+    private String loginLogPath = "C:/Projects/SmartHome/src/main/java/smarthome/logs/LoginLog.txt";
+    private String errorLogPath = "C:/Projects/SmartHome/src/main/java/smarthome/logs/ErrorLog.txt";
 
     private FileWriter fileWriter;
 
-    public LogFileManager() throws IOException{
-        logFile = new File(path);
+    public enum Log{
+        LOGIN,
+        ERROR;
+    }
+
+    public LogFileManager(Log chosenLog) throws IOException{
+
+        switch (chosenLog){
+
+            case LOGIN:
+                logFile = new File(loginLogPath);
+            break;
+
+            case ERROR:
+                logFile = new File(errorLogPath);
+            break;
+        }
+        
         logFile.setWritable(true);
         fileWriter = new FileWriter(logFile, true);
         logFile.setReadOnly();
@@ -27,7 +45,7 @@ public class LogFileManager{
     }
 
     public String getLogs() throws IOException{
-        String logs = Files.readString(Path.of(path));
+        String logs = Files.readString(Path.of(logFile.getAbsolutePath()));
         return logs;
     }
 }
