@@ -1,10 +1,10 @@
 package smarthome.managers;
 
-import java.net.*;
 import java.io.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+
+import smarthome.util.ErrorHandler;
 
 
 public class ScreenManager{
@@ -21,7 +21,7 @@ public class ScreenManager{
             Document doc = Jsoup.parse(file, "UTF-8");
             output.write(doc.outerHtml().getBytes());
         } catch (IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
     }
 

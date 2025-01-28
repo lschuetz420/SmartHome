@@ -1,6 +1,7 @@
 package smarthome.dialogs;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.Scanner;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 import smarthome.server.*;
+import smarthome.util.ErrorHandler;
 import smarthome.managers.WhitelistManager;
 
 public class Dialog implements Runnable{
@@ -26,6 +28,7 @@ public class Dialog implements Runnable{
    
     public void start(String[] args){
         Server server;
+        String IP;
         int port;
         int backlog;
 
@@ -34,11 +37,14 @@ public class Dialog implements Runnable{
 
             switch (mode){
                 case "start":
+                    IP = "127.0.0.1";
                     port = 4200;
                     backlog = 4;
+
                     server = Server.getInstance();
                     server.setBacklog(backlog);
-                    server.setPort(port);    
+                    server.setPort(port); 
+                    server.setIP(IP);  
                     server.start();                
                 break;
 
@@ -56,12 +62,12 @@ public class Dialog implements Runnable{
                         scanner.nextLine();
                         
                         System.out.println("IPAddress:");
-                        String ip = scanner.nextLine();
+                        IP = scanner.nextLine();
 
                         ok = portOK(port);
                         ok = backlogOK(backlog);
 
-                        boolean ipOK = ipOk(ip);
+                        boolean ipOK = ipOk(IP);
 
                         if (ipOK = true){
                             ok = true;
@@ -74,6 +80,7 @@ public class Dialog implements Runnable{
                             server = Server.getInstance();
                             server.setBacklog(backlog);
                             server.setPort(port);
+                            server.setIP(IP);
                             server.start();                    
                         }
 
@@ -126,6 +133,7 @@ public class Dialog implements Runnable{
                         serverSocket.close();
                     } catch(IOException e){
                         System.out.println("Server closed");
+                        new ErrorHandler().addLog(e);
                     }
                     
                     commandAccepted = true;
@@ -146,6 +154,14 @@ public class Dialog implements Runnable{
                 case "Delete-Entry -Target Whitelist":
                     deleteUserEntryWhitelistDialog();
                     commandAccepted = true;
+                break;
+
+                case "Get-Content -Target Whitelist":
+                    try{
+                        System.out.println(new WhitelistManager().getWhitelist());
+                    } catch (IOException e){
+                        new ErrorHandler().printToConsoleAddLog(e);
+                    }
                 break;
 
             }
@@ -172,7 +188,7 @@ public class Dialog implements Runnable{
         try{
             new WhitelistManager().addClient(client);
         } catch(IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
     }
 
@@ -213,7 +229,7 @@ public class Dialog implements Runnable{
                 try{
                     new WhitelistManager().addClient(client);
                 } catch(IOException e){
-                    e.printStackTrace();
+                    new ErrorHandler().printToConsoleAddLog(e);
                 }
             }
         }
@@ -222,11 +238,11 @@ public class Dialog implements Runnable{
     public void deleteUserEntryWhitelistDialog(){
         Scanner scanner = new Scanner(System.in);
         String whitelist = "";
-
+ 
         try {
             whitelist = new WhitelistManager().getWhitelist();
         } catch (IOException e){
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
 
         System.out.println("Whitelist:\n" + whitelist);
@@ -240,7 +256,7 @@ public class Dialog implements Runnable{
 
             case "Y":
             case "y":
-                System.out.println("Please enter the IP and host name of the client you want to delete.");
+                System.out.println("Please enter the IP and host name of the client you want to delete");
 
                 System.out.println("IP:");
                 ip = scanner.nextLine();
@@ -256,10 +272,10 @@ public class Dialog implements Runnable{
                     try {
                         new WhitelistManager().writeEntry(whitelist);
                     } catch(IOException e){
-                        e.printStackTrace();
+                        new ErrorHandler().printToConsoleAddLog(e);
                     }
                 } else {
-                    Sys
+                    System.out.println("Client not found");
                 }
 
             break;

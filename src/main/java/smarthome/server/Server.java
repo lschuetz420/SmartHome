@@ -9,12 +9,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import smarthome.dialogs.*;
-import smarthome.managers.*;
+import smarthome.managers.LogFileManager;
+import smarthome.managers.LogFileManager.Log;
+import smarthome.managers.WhitelistManager;
+import smarthome.util.ErrorHandler;
 
 public class Server{
     private static Server instance;
 
     private boolean ON = false;
+    private String IP;
     private int port;
     private int backlog; 
     private int clientCounter;
@@ -27,7 +31,8 @@ public class Server{
 
     }
 
-    public Server(int port, int backlog){
+    public Server(int port, int backlog, String IP){
+        this.IP = IP;
         this.port = port;
         this.backlog = backlog;
     }
@@ -43,9 +48,13 @@ public class Server{
     public void start(){
         try{
             if (ON == false){
-                serverSocket = new ServerSocket(port,backlog);
+
+                serverSocket = new ServerSocket();
+                InetSocketAddress socketAddress = new InetSocketAddress(IP, port);
+                serverSocket.bind(socketAddress);
 
                 System.out.println("Server listening on port " + port);
+                System.out.println("Address: " + serverSocket.getInetAddress().getHostAddress());
 
                 ON = true;    
 
@@ -63,7 +72,7 @@ public class Server{
                     LocalDate date = LocalDate.now();
                     LocalTime time = LocalTime.now();
                     String log = "New user connected. IP: " + clientIP + " HostName: " + clientName + " Date: " + date + " Time: " + time;
-                    new LogFileManager().addLog(log);
+                    new LogFileManager(Log.LOGIN).addLog(log);
                     System.out.println(log);
                     
                     WhitelistManager whitelistManager = new WhitelistManager();
@@ -73,17 +82,18 @@ public class Server{
                     } else{
                         String logNotWhitelisted = "User not whitelisted. Connection refused."; 
                         System.out.println(logNotWhitelisted);
-                        new LogFileManager().addLog(logNotWhitelisted);
+                        new LogFileManager(Log.LOGIN).addLog(logNotWhitelisted);
                     }
                 }
             } else {
-
+                System.out.println("Server already started");
             }  
         } catch(SocketException e){    
             System.out.println("Server closed");
+            new ErrorHandler().printToConsoleAddLog(e);
         } catch(IOException e){
             System.out.println("Server exception");
-            e.printStackTrace();
+            new ErrorHandler().printToConsoleAddLog(e);
         }
     }   
 
@@ -110,6 +120,10 @@ public class Server{
 
     public void setBacklog(int backlog){
         this.backlog = backlog;
+    }
+
+    public void setIP(String IP){
+        this.IP = IP;
     }
 
     public Integer getCLientCounter(){
