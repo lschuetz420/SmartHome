@@ -207,7 +207,7 @@ public class Dialog implements Runnable{
             int counter = 0;
 
             for (int i = 0; i < clients.size(); i++){
-                counter = counter++;
+                counter++;
     
                 Client client = clients.get(i);
     
