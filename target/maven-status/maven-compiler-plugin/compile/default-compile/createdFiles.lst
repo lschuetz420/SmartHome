@@ -7,5 +7,3 @@ smarthome\managers\WhitelistManager.class
 smarthome\server\ClientHandler.class
 smarthome\server\Client.class
 smarthome\SmartHome.class
-smarthome\lib\jsoup.jar
-smarthome\properties\Whitelist.txt
