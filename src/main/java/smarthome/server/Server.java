@@ -65,7 +65,7 @@ public class Server{
                     Socket clientSocket = serverSocket.accept();
                     
                     String clientIP = clientSocket.getInetAddress().getHostAddress();
-                    String clientName = clientSocket.getInetAddress().getHostName();
+                    String clientName = clientSocket.getInetAddress(). getHostName();
                     Client client = new Client(clientIP, clientName);
                     clients.add(client);
 
