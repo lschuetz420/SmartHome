@@ -17,7 +17,9 @@ public class LogFileManager{
 
     public enum Log{
         LOGIN,
-        ERROR;
+        ERROR,
+        Hurensohn;
+
     }
 
     public LogFileManager(Log chosenLog) throws IOException{
