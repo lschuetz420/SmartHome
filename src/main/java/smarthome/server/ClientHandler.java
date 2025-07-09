@@ -1,10 +1,10 @@
 package smarthome.server;
 
-import java.net.*;
-
 import smarthome.managers.ScreenManager;
 import smarthome.util.ErrorHandler;
 
+import java.net.*;
+import java.util.ArrayList;
 import java.io.*;
 import java.io.IOException;
 
@@ -24,14 +24,15 @@ public class ClientHandler implements Runnable{
             InputStream input = socket.getInputStream();
             OutputStream output = socket.getOutputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(input));   
-            
-            String request = reader.readLine();
+            ArrayList<String> request = new ArrayList<String>();
 
-            if (request == null){
-                return;
+            while (reader.readLine() != null && !reader.readLine().isEmpty()){
+                request.add(reader.readLine());
             }
+            
+            String line0 = request.get(0);
 
-            boolean ContainsGET = request.contains("GET");
+            boolean ContainsGET = line0.contains("GET");
 
             if (ContainsGET = false){
                 return;

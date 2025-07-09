@@ -19,7 +19,7 @@ public class WhitelistManager{
     public WhitelistManager() throws IOException{
         whitelistFile = new File(path);
         whitelistFile.setWritable(true);
-        fileWriter = new FileWriter(whitelistFile);
+        fileWriter = new FileWriter(whitelistFile, true);
         whitelistFile.setReadOnly();
     }
 
@@ -71,10 +71,9 @@ public class WhitelistManager{
         try{
             String whitelist = getWhitelist();
             String clientdata = client.toString();
-
             if (whitelist.contains(clientdata)){
                 ok = true;
-            } ok = false;
+            } 
 
         } catch(IOException e){
             new ErrorHandler().printToConsoleAddLog(e);
