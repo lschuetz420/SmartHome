@@ -25,7 +25,8 @@ public class Server{
     
     private ServerSocket serverSocket;
 
-    ArrayList<Client> clients = new ArrayList<Client>();
+    private ArrayList<Client> clients = new ArrayList<Client>();
+    private ArrayList<Thread> threads = new ArrayList<Thread>();
 
     public Server(){
 
@@ -65,7 +66,7 @@ public class Server{
                     Socket clientSocket = serverSocket.accept();
                     
                     String clientIP = clientSocket.getInetAddress().getHostAddress();
-                    String clientName = clientSocket.getInetAddress(). getHostName();
+                    String clientName = clientSocket.getInetAddress().getHostName();
                     Client client = new Client(clientIP, clientName);
                     clients.add(client);
 
@@ -77,8 +78,10 @@ public class Server{
                     
                     WhitelistManager whitelistManager = new WhitelistManager();
 
-                    if (whitelistManager.ClientOK(client)){
-                        new Thread(new ClientHandler(clientSocket)).start();
+                     if (whitelistManager.ClientOK(client)){
+                        Thread thread = new Thread(new ClientHandler(clientSocket));
+                        thread.start();
+                        threads.add(thread);
                     } else{
                         String logNotWhitelisted = "User not whitelisted. Connection refused."; 
                         System.out.println(logNotWhitelisted);
@@ -88,9 +91,12 @@ public class Server{
             } else {
                 System.out.println("Server already started");
             }  
-        } catch(SocketException e){    
+        } catch(SocketException e){
+            for (int i = 0; i < threads.size();i++){
+                Thread thread = threads.get(i);
+                thread.interrupt();
+            }    
             System.out.println("Server closed");
-            new ErrorHandler().printToConsoleAddLog(e);
         } catch(IOException e){
             System.out.println("Server exception");
             new ErrorHandler().printToConsoleAddLog(e);
