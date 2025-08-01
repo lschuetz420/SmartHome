@@ -95,7 +95,8 @@ public class Server{
             for (int i = 0; i < threads.size();i++){
                 Thread thread = threads.get(i);
                 thread.interrupt();
-            }    
+            }
+            ON = false;    
             System.out.println("Server closed");
         } catch(IOException e){
             System.out.println("Server exception");

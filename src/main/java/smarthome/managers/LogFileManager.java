@@ -15,11 +15,9 @@ public class LogFileManager{
 
     private FileWriter fileWriter;
 
-    public enum Log{
+    public enum Log{    
         LOGIN,
-        ERROR,
-        Hurensohn;
-
+        ERROR;
     }
 
     public LogFileManager(Log chosenLog) throws IOException{

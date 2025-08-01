@@ -17,7 +17,7 @@ public class ScreenManager{
 
     public void showLogin(){
         try {
-            File file = new File("./frontend/html/loginscreen.html");
+            File file = new File("./frontend/index.html");
             Document doc = Jsoup.parse(file, "UTF-8");
             output.write(doc.outerHtml().getBytes());
         } catch (IOException e){
