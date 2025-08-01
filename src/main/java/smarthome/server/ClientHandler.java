@@ -12,77 +12,122 @@ import java.nio.file.*;
 public class ClientHandler implements Runnable{
     
     private Socket socket;
-
+    private boolean awaitResponse = true;
+    
     public ClientHandler(Socket socket){
         this.socket = socket;
     }
-
+    
     @Override
     public void run() {
         try{
-            boolean awaitResponse = true;
 
-            while (awaitResponse){
+            while (awaitResponse && !Thread.interrupted()){
 
-                InputStream input = socket.getInputStream();
                 OutputStream output = socket.getOutputStream();
+                InputStream input = socket.getInputStream();
+
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input));   
                 ArrayList<String> request = new ArrayList<String>();
                 
-                while (reader.readLine() != null){
-                    request.add(reader.readLine());
-                }
+                boolean read = true;    
                 
-                for (int i = 0; i < request.size(); i++){
-                    System.out.println(request.get(i));
+                while (read){
+                    System.out.println("HTTP:");
+                    String line = reader.readLine();
+                    if (line == null){
+                        read = false;
+                        break;
+                    }
+
+                    if (line.isEmpty()){
+                        read = false;
+                    } else {
+                        request.add(line);
+                    }
                 }
-                
-                String line0 = request.get(0);
-                
-                if (line0.contains("GET / HTTP/1.1") | line0.contains("GET /index.html HTTP/1.1")){
-                    sendFileAsOutput("index.htm", output);
-                } else if (line0.contains("GET /style.css")){
-                    sendFileAsOutput("style.css", output);   
-                } else if (line0.contains("GET /script.js")){
-                    sendFileAsOutput("script.js", output);
-                } else {
-                    sendTextAsOutput("404 Not Found", "404 Not Found", output);
+
+                if (request.size() != 0){
+                /* *for testing http* 
+                    for (int i = 0; i < request.size(); i++){
+                        System.out.println(request.get(i));
+                    }
+                */
+                    String line0 = request.get(0);
+                    
+                    if (line0.contains("GET")){
+                        String[] parts = line0.split(" ");
+                        String requestedFile = parts[1];
+                        sendFile(requestedFile,output);
+                    } else if (line0.contains("POST")){
+                        if (line0.contains("fW6zTqJ0nPBmKv19aXcdLryOUE38gZsj")){
+                            
+                        }
+                    }
                 }
-            
             }
-        } catch(IOException e){
+        } catch(Exception e){
             new ErrorHandler().printToConsoleAddLog(e);
         }
-        
     }
 
-    private void sendFileAsOutput(String fileName, OutputStream output) throws IOException{
-
+    private void sendFile(String fileName, OutputStream output){
         String contentType = "";
+        String endOfFileName = "";
+        boolean fileFound = true;
 
-        if (fileName.endsWith(".html")){
+        if (fileName.contains(".")){
+
+            endOfFileName = fileName.split("\\.")[1];
+            
+            switch (endOfFileName) {
+                case "html":
+                    contentType = "text/html; charset=UTF-8s";    
+                break;
+            
+                case "css":
+                    contentType = "text/css";
+                break;
+    
+                case "javascript":
+                    contentType = "application/javascript";
+                break;
+    
+                case "png":
+                    contentType = "image/png";
+                break;
+    
+                case "jpeg":
+                    contentType = "image/jpeg";
+                break;
+            }
+
+        } else if (fileName.equals("/")){
             contentType = "text/html; charset=UTF-8s";
+            endOfFileName = "html";
+            fileName = "index.html";
+        } else {    
+            fileFound = false;
         }
 
-        if (fileName.endsWith(".css")){
-            contentType = "text/css";
+        byte [] content = null;
+
+        try {
+            Path path = Path.of("C:\\Projects\\SmartHome\\frontend\\" + endOfFileName + "\\" + fileName);
+            content = Files.readAllBytes(path);
+        } catch (Exception e){
+            fileFound = false;    
         }
 
-        if (fileName.endsWith(".javascript")){
-            contentType = "application/javascript";
+        if (fileFound == true){
+            sendContentHTTP(content, contentType, output);
+        } else{
+            sendTextHTTP("404 Not Found", "404 Not Found", output);
         }
-
-        if (fileName.endsWith(".png")){
-            contentType = "image/png";
-        }
-
-        if (fileName.endsWith(".jpeg")){
-            contentType = "image/jpeg";
-        }
-
-        Path path = Path.of("C:\\Projects\\SmartHome\\frontend\\" + fileName);
-        byte [] content = Files.readAllBytes(path);
-                    	
+                    	    
+    }
+    
+    private void sendContentHTTP(byte [] content, String contentType, OutputStream output){
         PrintWriter writer = new PrintWriter(output);
         writer.println("HTTP/1.1 200 OK");
         writer.println("Content-Type: " + contentType);
@@ -90,11 +135,15 @@ public class ClientHandler implements Runnable{
         writer.println();
         writer.flush();
 
-        output.write(content);
-        output.flush();
+        try{
+            output.write(content);
+            output.flush();
+        } catch (Exception e){
+            new ErrorHandler().printToConsoleAddLog(e);
+        }
     }
 
-    private void sendTextAsOutput(String HTTPstatus, String text, OutputStream output){
+    private void sendTextHTTP(String HTTPstatus, String text, OutputStream output){
         PrintWriter writer = new PrintWriter(output);
         writer.println("HTTP/1.1 " + HTTPstatus);
         writer.println("Content-Type: text/plain");
@@ -102,6 +151,10 @@ public class ClientHandler implements Runnable{
         writer.println();
         writer.println(text);
         writer.flush();
+    }
+
+    public void setResponse(boolean awaitResponse){
+        this.awaitResponse = awaitResponse;
     }
 
 }
